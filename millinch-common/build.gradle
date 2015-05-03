@@ -1,0 +1,30 @@
+project(':millinch-common'){
+    // 设置resource文件目录，引入java文件夹下的xml文件
+    sourceSets {
+        main {
+            java {
+                srcDir 'src/main/java'
+            }
+            resources {
+                srcDir 'src/main/resources'
+            }
+            //resources.srcDirs = ['src/main/resources', 'src/main/java']
+            resources.includes = ['src/main/java/**.xml']
+        }
+        test {
+            //resources.testSrcDirs = ['src/test/resources', 'src/test/java']
+            java {
+                srcDir 'src/main/java'
+            }
+            resources {
+                srcDir 'src/main/resources'
+            }
+        }
+    }
+    dependencies {
+        compile(
+                fileTree(dir: 'lib' , include: '*.jar' )
+        )
+        testCompile group: 'org.springframework', name: 'spring-test', version: '4.0.3.RELEASE'
+    }
+}

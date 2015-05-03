@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.springframework.org/schema/beans" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+    xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+    http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.2.xsd
+    http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa-1.3.xsd">
+
+    <description>Spring公共配置</description>
+    <bean id="txMgr" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!-- 产品正式环境 -->
+    <beans profile="production">
+        <context:property-placeholder ignore-resource-not-found="true" location="classpath:/conf/db/production.properties"/>
+        <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+            <property name="driverClassName" value="${jdbc.driver}"/>
+            <property name="url" value="${jdbc.url}"/>
+            <property name="username" value="${jdbc.username}"/>
+            <property name="password" value="${jdbc.password}"/>
+            <property name="initialSize" value="${initialSize}"/>
+            <property name="minIdle" value="${minIdle}"/>
+            <property name="maxActive" value="${maxActive}"/>
+            <property name="maxWait" value="${maxWait}"/>
+            <!-- 连接Idle10分钟后超时，每1分钟检查一次 -->
+            <property name="timeBetweenEvictionRunsMillis" value="${timeBetweenEvictionRunsMills}"/>
+            <property name="minEvictableIdleTimeMillis" value="${minEvictableIdleTimeMillis}"/>
+
+            <property name="validationQuery" value="${validationQuery}"/>
+            <property name="testWhileIdle" value="${testWhileIdle}"/>
+            <property name="testOnBorrow" value="${testOnBorrow}"/>
+            <property name="testOnReturn" value="${testOnReturn}"/>
+            
+            <property name="poolPreparedStatements" value="${poolPreparedStatements}"/>
+            <property name="maxPoolPreparedStatementPerConnectionSize" value="${maxPoolPreparedStatementPerConnectionSize}"/>
+            
+            <property name="filters" value="${filters}"/>
+        </bean>
+  </beans>
+
+    <!-- 开发环境 -->
+    <beans profile="development">
+        <!-- 多个property-placeholder 需设 ignore-unresolvable="true" -->
+        <context:property-placeholder order="1" ignore-unresolvable="true" location="classpath:/conf/db/development.properties"/>
+
+        <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+            <property name="driverClassName" value="${jdbc.driver}"/>
+            <property name="url" value="${jdbc.url}"/>
+            <property name="username" value="${jdbc.username}"/>
+            <property name="password" value="${jdbc.password}"/>
+            <property name="filters" value="${filters}"/>
+        </bean>
+        <!--<jdbc:initialize-database data-source="dataSource" ignore-failures="ALL">
+            <jdbc:script location="classpath:sql/mysql/schema.sql"/>
+            <jdbc:script location="classpath:sql/mysql/import-data.sql"/>
+        </jdbc:initialize-database>-->
+  </beans>
+
+    <!-- 单元测试环境 -->
+    <beans profile="test">
+        <context:property-placeholder ignore-resource-not-found="true" location="classpath:/conf/db/test.properties"/>
+        <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+            <property name="driverClass" value="${jdbc.driver}"/>
+            <property name="url" value="${jdbc.url}"/>
+            <property name="username" value="${jdbc.username}"/>
+            <property name="password" value="${jdbc.password}"/>
+        </bean>
+    </beans>
+
+</beans>

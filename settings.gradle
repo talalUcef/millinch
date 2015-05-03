@@ -17,3 +17,4 @@ include 'services:webservice'
 */
 
 rootProject.name = 'millinch-project'
+include 'millinch-common','millinch-data'

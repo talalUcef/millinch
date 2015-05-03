@@ -1,61 +1,43 @@
-apply plugin: 'war'
-apply plugin: 'jetty'
-apply plugin: 'tomcat'
-
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
-version = '1.0'
-
-repositories {
-    mavenCentral()
-    maven { url "http://maven.oschina.net/content/groups/public/" }
-    maven { url "http://repo.maven.apache.org/maven2" }
-    maven { url "http://repo.spring.io/milestone" }
-}
-
-dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.11'
-    compile 'org.springframework:spring-webmvc:3.2.0.RELEASE'
-    runtime 'javax.servlet:jstl:1.1.2'
-
-    def tomcatVersion = '7.0.11'
-    tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
-            "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}"
-    tomcat("org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}") {
-        exclude group: 'org.eclipse.jdt.core.compiler', module: 'ecj'
-    }
-}
-
-tomcat {
-    httpPort = 8090
-    stopPort = 8091
-    //httpsPort = 8091
-    //enableSSL = true
-}
-
-tomcatRun{
-    contextPath= 'server'
-    URIEncoding= 'UTF-8'
-    reloadable = 'true'
-
-}
-
-
-httpPort = 8090
-stopPort  = 8091
-stopKey = "killjetty"
-
-jettyRun{
-    contextPath = 'server'
-    reload = 'automatic'
-    scanIntervalSeconds = 10
-}
 buildscript {
     repositories {
         jcenter()
     }
+    dependencies {
+        classpath 'org.gradle.api.plugins:gradle-tomcat-plugin:+'
+    }
+}
+
+project(':millinch-data'){
+    apply plugin: 'war'
+    apply plugin: 'tomcat'
+
+    // 自定义resource文件夹
+    sourceSets {
+        main {
+            resources.srcDirs = ['src/main/resources']
+        }
+    }
 
     dependencies {
-        classpath 'org.gradle.api.plugins:gradle-tomcat-plugin:1.2.3'
+        compile( project(":millinch-common") )
+        def tomcatVersion = '7.0.11'
+        tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
+                "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}"
+        tomcat("org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}") {
+            exclude group: 'org.eclipse.jdt.core.compiler', module: 'ecj'
+        }
     }
+
+    tomcat {
+        httpPort = 8080
+        stopPort = 8091
+        httpsPort = 8443
+        enableSSL = true
+    }
+    tomcatRun{
+        contextPath= 'server'
+        URIEncoding= 'UTF-8'
+        reloadable = 'true'
+    }
+
 }
